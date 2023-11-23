@@ -1,0 +1,130 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="sources">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="imgui">
+      <UniqueIdentifier>{a82cba23-9de0-45c2-b1e3-2eb1666702de}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="sources\imgui">
+      <UniqueIdentifier>{a38d8fdf-3acc-47c7-93aa-5cce8465b09c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="sources\src">
+      <UniqueIdentifier>{3db1d59b-ca0d-4ad5-90cb-d1e38ce2dc17}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="sources\src\game">
+      <UniqueIdentifier>{a735f4f2-7d96-4abd-be75-59c81ea76b9a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="sources\src\engine">
+      <UniqueIdentifier>{ddc0d6a3-1e07-4917-b9c7-f9e3486b6094}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="sources\src\engine\headers">
+      <UniqueIdentifier>{048660c8-43cc-47a1-8f18-44f7fdf78547}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="sources\src\engine\sources">
+      <UniqueIdentifier>{e6d5c4a0-7f9f-4b07-962d-074b20a5e547}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="sources\src\engine\headers\components">
+      <UniqueIdentifier>{2af02cd4-6fbb-45ba-94ad-a0ab2dcc5cbe}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="sources\src\engine\sources\components">
+      <UniqueIdentifier>{b88f432e-af9d-4096-a7bf-d7fb7188059e}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="renderer.cpp">
+      <Filter>sources\src\engine\sources</Filter>
+    </ClCompile>
+    <ClCompile Include="input.cpp">
+      <Filter>sources\src\engine\sources</Filter>
+    </ClCompile>
+    <ClCompile Include="main.cpp">
+      <Filter>sources\src\engine\sources</Filter>
+    </ClCompile>
+    <ClCompile Include="include\imgui_impl_win32.cpp">
+      <Filter>sources\imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="include\imgui_impl_dx9.cpp">
+      <Filter>sources\imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="engine.cpp">
+      <Filter>sources\src\engine\sources</Filter>
+    </ClCompile>
+    <ClCompile Include="game.cpp">
+      <Filter>sources\src\game</Filter>
+    </ClCompile>
+    <ClCompile Include="camera.cpp">
+      <Filter>sources\src\engine\sources\components</Filter>
+    </ClCompile>
+    <ClCompile Include="component.cpp">
+      <Filter>sources\src\engine\sources\components</Filter>
+    </ClCompile>
+    <ClCompile Include="gameObject.cpp">
+      <Filter>sources\src\engine\sources\components</Filter>
+    </ClCompile>
+    <ClCompile Include="include\imgui_demo.cpp">
+      <Filter>imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="include\imgui_draw.cpp">
+      <Filter>imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="include\imgui_tables.cpp">
+      <Filter>imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="include\imgui_widgets.cpp">
+      <Filter>imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="include\imgui.cpp">
+      <Filter>imgui</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="engine.h">
+      <Filter>sources\src\engine\headers</Filter>
+    </ClInclude>
+    <ClInclude Include="renderer.h">
+      <Filter>sources\src\engine\headers</Filter>
+    </ClInclude>
+    <ClInclude Include="include\imgui_impl_dx9.h">
+      <Filter>sources\imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="include\imgui_impl_win32.h">
+      <Filter>sources\imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="camera.h">
+      <Filter>sources\src\engine\headers\components</Filter>
+    </ClInclude>
+    <ClInclude Include="game.h">
+      <Filter>sources\src\game</Filter>
+    </ClInclude>
+    <ClInclude Include="input.h">
+      <Filter>sources\src\engine\headers</Filter>
+    </ClInclude>
+    <ClInclude Include="gameObject.h">
+      <Filter>sources\src\engine\headers\components</Filter>
+    </ClInclude>
+    <ClInclude Include="component.h">
+      <Filter>sources\src\engine\headers\components</Filter>
+    </ClInclude>
+    <ClInclude Include="include\imgui.h">
+      <Filter>imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="include\imgui_internal.h">
+      <Filter>imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="include\imstb_rectpack.h">
+      <Filter>imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="include\imstb_textedit.h">
+      <Filter>imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="include\imstb_truetype.h">
+      <Filter>imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="include\imconfig.h">
+      <Filter>imgui</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>
