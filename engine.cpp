@@ -11,6 +11,8 @@ namespace engine {
     }
 
 
+
+
     fn* renderSubscribers[10] = {};
     int renderIndex = 0;
     void onRender(fn* f) {
