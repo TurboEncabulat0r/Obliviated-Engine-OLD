@@ -28,9 +28,6 @@
     <ClCompile Include="camera.cpp">
       <Filter>src\engine</Filter>
     </ClCompile>
-    <ClCompile Include="component.cpp">
-      <Filter>src\engine</Filter>
-    </ClCompile>
     <ClCompile Include="engine.cpp">
       <Filter>src\engine</Filter>
     </ClCompile>
@@ -45,6 +42,9 @@
     </ClCompile>
     <ClCompile Include="renderer.cpp">
       <Filter>src\engine</Filter>
+    </ClCompile>
+    <ClCompile Include="component.cpp">
+      <Filter>src\engine\components</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -78,9 +78,6 @@
     <ClInclude Include="camera.h">
       <Filter>src\engine</Filter>
     </ClInclude>
-    <ClInclude Include="component.h">
-      <Filter>src\engine</Filter>
-    </ClInclude>
     <ClInclude Include="engine.h">
       <Filter>src\engine</Filter>
     </ClInclude>
@@ -93,6 +90,9 @@
     <ClInclude Include="renderer.h">
       <Filter>src\engine</Filter>
     </ClInclude>
+    <ClInclude Include="component.h">
+      <Filter>src\engine\components</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="imgui">
@@ -103,6 +103,9 @@
     </Filter>
     <Filter Include="src\engine">
       <UniqueIdentifier>{4fd515ba-fec3-4e2b-ac39-f5b2a83e0a90}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\engine\components">
+      <UniqueIdentifier>{65efd1b3-e23c-413a-bccd-dab023889f3d}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>

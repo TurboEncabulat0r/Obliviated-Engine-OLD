@@ -122,12 +122,6 @@ namespace engine {
         device->DrawPrimitive(D3DPT_TRIANGLESTRIP, 0, 2);
     }
 
-
-    void onrender() {
-        
-        
-    }
-
     void newFrame() {
         // setup vertex buffer for frame
         device->CreateVertexBuffer(8 * sizeof(TEXTUREDVERTEX),
@@ -344,7 +338,6 @@ namespace engine {
         InitializeWindow();
         logf("Renderer init");
         mainCamera = new Camera2D(SCREENWIDTH, SCREENHEIGHT, 0.0f, 1);
-        onRender(*onrender);
         onDrawUI(&onDrawRendererUi);
         
     }

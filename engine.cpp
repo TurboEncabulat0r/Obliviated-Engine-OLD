@@ -126,6 +126,7 @@ namespace engine {
             ImGui::InputFloat("y", &selected->y);
             ImGui::InputFloat("size", &selected->size);
             ImGui::InputText("name", &selected->name[0], 100);
+            selected->drawSerialElements();
         }
         ImGui::End();
     }

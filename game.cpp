@@ -56,6 +56,7 @@ namespace game {
             this->size = size;
             this->name = name;
             this->tex = tex;
+            this->serializeValue("vel x", &xvel);
         }
 
         void draw() {
