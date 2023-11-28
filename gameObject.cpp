@@ -76,6 +76,14 @@ namespace engine{
             fptr = reinterpret_cast<float*>(v.ptr);
             ImGui::DragFloat(v.label, fptr);
             break;
+        case 'b':
+            bptr = reinterpret_cast<bool*>(v.ptr);
+            ImGui::Checkbox(v.label, bptr);
+            break;
+        case 't':
+            bptr = reinterpret_cast<bool*>(v.ptr);
+            ImGui::Checkbox(v.label, bptr);
+            break;
         default:
             break;
         }
@@ -84,6 +92,7 @@ namespace engine{
     void GameObject::drawSerialElements() {
         for (int i = 0; i < this->nValues; i++) {
             if (this->values[i].type != 'n') {
+                ImGui::SetNextItemWidth(140);
                 drawSerialElement(this->values[i]);
             }
         }

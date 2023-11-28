@@ -118,14 +118,21 @@ namespace engine {
 
 
     void drawInspector() {
-        ImGui::Begin("Inspector");
+        ImGui::ShowDemoWindow();
+        ImGui::Begin("Inspector", NULL, ImGuiWindowFlags_NoResize);
         if (selected != nullptr) {
             ImGui::Text(selected->name.c_str());
             // editable values
-            ImGui::InputFloat("x", &selected->x);
-            ImGui::InputFloat("y", &selected->y);
-            ImGui::InputFloat("size", &selected->size);
+            ImGui::SetNextItemWidth(140);
             ImGui::InputText("name", &selected->name[0], 100);
+            ImGui::SetNextItemWidth(60);
+            ImGui::DragFloat("x", &selected->x);
+            ImGui::SameLine();
+            ImGui::SetNextItemWidth(60);
+            ImGui::DragFloat("y", &selected->y);
+            ImGui::SetNextItemWidth(140);
+            ImGui::DragFloat("size", &selected->size);
+
             selected->drawSerialElements();
         }
         ImGui::End();
