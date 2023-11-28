@@ -1,0 +1,108 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="include\imgui.cpp">
+      <Filter>imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="include\imgui_demo.cpp">
+      <Filter>imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="include\imgui_draw.cpp">
+      <Filter>imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="include\imgui_impl_dx9.cpp">
+      <Filter>imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="include\imgui_impl_win32.cpp">
+      <Filter>imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="include\imgui_tables.cpp">
+      <Filter>imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="include\imgui_widgets.cpp">
+      <Filter>imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="game.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="camera.cpp">
+      <Filter>src\engine</Filter>
+    </ClCompile>
+    <ClCompile Include="component.cpp">
+      <Filter>src\engine</Filter>
+    </ClCompile>
+    <ClCompile Include="engine.cpp">
+      <Filter>src\engine</Filter>
+    </ClCompile>
+    <ClCompile Include="gameObject.cpp">
+      <Filter>src\engine</Filter>
+    </ClCompile>
+    <ClCompile Include="input.cpp">
+      <Filter>src\engine</Filter>
+    </ClCompile>
+    <ClCompile Include="main.cpp">
+      <Filter>src\engine</Filter>
+    </ClCompile>
+    <ClCompile Include="renderer.cpp">
+      <Filter>src\engine</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="include\imconfig.h">
+      <Filter>imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="include\imgui.h">
+      <Filter>imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="include\imgui_impl_dx9.h">
+      <Filter>imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="include\imgui_impl_win32.h">
+      <Filter>imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="include\imgui_internal.h">
+      <Filter>imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="include\imstb_rectpack.h">
+      <Filter>imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="include\imstb_textedit.h">
+      <Filter>imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="include\imstb_truetype.h">
+      <Filter>imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="game.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="camera.h">
+      <Filter>src\engine</Filter>
+    </ClInclude>
+    <ClInclude Include="component.h">
+      <Filter>src\engine</Filter>
+    </ClInclude>
+    <ClInclude Include="engine.h">
+      <Filter>src\engine</Filter>
+    </ClInclude>
+    <ClInclude Include="gameObject.h">
+      <Filter>src\engine</Filter>
+    </ClInclude>
+    <ClInclude Include="input.h">
+      <Filter>src\engine</Filter>
+    </ClInclude>
+    <ClInclude Include="renderer.h">
+      <Filter>src\engine</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="imgui">
+      <UniqueIdentifier>{cb4751cc-efd7-4f91-9296-e1d3da709ee8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src">
+      <UniqueIdentifier>{ee8c4fd0-1e61-4820-9357-dd1ee23d779e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\engine">
+      <UniqueIdentifier>{4fd515ba-fec3-4e2b-ac39-f5b2a83e0a90}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>

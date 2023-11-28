@@ -76,18 +76,6 @@ namespace game {
         p.update();
     }
 
-    void renderUi() {
-        ImGui::Begin("Object Viewer");
-        // displays a list of values for the player object, should be editable
-        ImGui::Text("Player");
-        ImGui::Text("x: %f", p.x);
-        ImGui::Text("y: %f", p.y);
-        ImGui::Text("xvel: %f", p.xvel);
-        ImGui::Text("yvel: %f", p.yvel);
-        ImGui::End();
-        
-    }
-
     // called every frame
     void render() {
         p.draw();
@@ -105,7 +93,6 @@ namespace game {
         input::onKeyPress(*keyPress);
         engine::onRender(*render);
         engine::onUpdate(*update);
-        engine::onDrawUI(*renderUi);
         
         background = new GameObject(350, 350, 700, "Background", NULL);
         engine::loadTexture(L"textures/cat.png", &p.tex);
