@@ -1,4 +1,5 @@
 #include "engine.h"
+#include "camera.h"
 #include "input.h"
 #include <DirectXMath.h>
 #include <D3dx9math.h>

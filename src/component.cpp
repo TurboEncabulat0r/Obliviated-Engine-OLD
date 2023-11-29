@@ -2,8 +2,9 @@
 
 
 namespace engine {
-    Component::Component(GameObject* gameObject) {
+    Component::Component(GameObject* gameObject, std::string name) {
         this->gameObject = gameObject;
+        registerComponent(this);
     }
 
     Component::~Component() {

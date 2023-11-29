@@ -1,19 +1,19 @@
-#include "engine.h"
 #include "gameObject.h"
+#include "engine.h"
 namespace engine{
     void GameObject::draw() {
-        drawTexturedSquare(x, y, size, 0xffffff, tex);
+        if (this->texture.lpdMat != nullptr)
+            drawTexturedSquare(x, y, size, 0xffffff, this->texture.lpdMat);
     }
 
     GameObject::GameObject(float x, float y, float size, std::string name, Texture tex) {
         this->x = x;
         this->y = y;
         this->size = size;
-        this->tex = tex;
+        this->texture = tex;
         this->name = name;
         registerGameObject(this);
-
-        ZeroMemory(this->values, sizeof(values));
+        this->values.resize(10);
 
         for (int i = 0; i < 20; i++) {
             if (components[i] != nullptr) {
@@ -23,17 +23,22 @@ namespace engine{
     }
 
 
-
     void GameObject::addSerialValue(const char* label, char t, uintptr_t p) {
-        logf("serialized value ");
+        if (values.size() == 0 || nValues + 1 >= values.size()) {
+            values.resize(values.size() + 10);
+            logf("alloc more values; new value: " + std::to_string(values.size()));
+
+        }
+
+        std::string s = label;
+        logf("serialized value: " + s);
         for (int i = 0; i < nValues; i++) {
             if (values[i].type == 0) {
                 values[i] = serialValue(label, t, p);
+                nValues++;
                 break;
             }
         }
-
-        nValues = (sizeof(this->values) / sizeof(serialValue));
     }
 
     // reinterprate values
@@ -90,7 +95,7 @@ namespace engine{
     }
 
     void GameObject::drawSerialElements() {
-        for (int i = 0; i < this->nValues; i++) {
+        for (int i = 0; i < this->values.size(); i++) {
             if (this->values[i].type != 'n') {
                 ImGui::SetNextItemWidth(140);
                 drawSerialElement(this->values[i]);

@@ -46,6 +46,9 @@
     <ClCompile Include="component.cpp">
       <Filter>src\engine\components</Filter>
     </ClCompile>
+    <ClCompile Include="playerMovement.cpp">
+      <Filter>src\engine\components</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\imconfig.h">

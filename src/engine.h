@@ -7,10 +7,11 @@
 #include <iostream>
 #include <D3dx9tex.h>
 #include <DirectXMath.h>
+#include "renderer.h"
 
 // components
-#include "GameObject.h"
-#include "camera.h"
+#include "gameObject.h"
+#include "component.h"
 
 using fn = void(void);
 using fnc = void(char);
@@ -19,8 +20,9 @@ using fnc = void(char);
 #pragma comment (lib, "d3dx9.lib")
 
 namespace engine {
-
     class GameObject;
+    class Texture;
+    class Component;
     
     void onRender(fn* f);
 
@@ -39,19 +41,25 @@ namespace engine {
     void invokeOnUpdate();
 
     void invokeOnRender();
+    void registerTexture(Texture t);
 
     bool getVsync();
 
     float getDeltaTime();
 
-    void logf(char* str);
-    void logf(char* str, char type);
+    void logf(const char* str);
+    void logf(std::string str);
+    void logf(const char* str, char type);
 
     void registerGameObject(GameObject* go);
 
     void unregisterGameObject(GameObject* go);
 
+    void registerComponent(Component* c);
+
     int FullRender();
 
     void ShutDown();
+
+    float getTime();
 }

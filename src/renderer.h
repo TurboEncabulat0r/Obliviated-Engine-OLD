@@ -1,7 +1,7 @@
 #pragma once
 #include "engine.h"
 #include "camera.h"
-using Texture = LPDIRECT3DTEXTURE9;
+#include <vector>
 namespace engine {
     LRESULT WINAPI WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
     struct CUSTOMVERTEX
@@ -24,6 +24,16 @@ namespace engine {
         float tv; /**< The v-coordinate of the texture coordinate. */
     };
 
+    class Texture {
+    public:
+        LPDIRECT3DTEXTURE9 lpdMat;
+        int width;
+        int height;
+        std::string name;
+        Texture(LPDIRECT3DTEXTURE9 tex, std::string name);
+        Texture();
+    };
+
     
 
     void drawTriangle(float x1, float y1, float x2, float y2, float x3, float y3, int color);
@@ -38,9 +48,13 @@ namespace engine {
 
     void endFrame();
 
-    int loadTexture(LPCWSTR path, LPDIRECT3DTEXTURE9* tex);
+    int loadTexture(std::string name, LPCWSTR path, Texture* tex);
+
+    void getRegisteredTextures(std::vector<Texture>* t);
 
     void getCamera(Camera2D** cam);
+
+    void rendererInit();
 
     
 

@@ -3,6 +3,7 @@
 #include "engine.h"
 #include "component.h"
 #include <string>
+#include <vector>
 using Texture = LPDIRECT3DTEXTURE9;
 namespace engine{
     // forward declaration 
@@ -10,7 +11,7 @@ namespace engine{
 
     struct serialValue {
         const char* label;
-        char type;
+        char type = 0;
         uintptr_t ptr;
         serialValue(const char* l, char t, uintptr_t p) {
             this->label = l;
@@ -19,19 +20,19 @@ namespace engine{
         }
 
         serialValue() {
-            this->type = 'n';
+            this->type = 0;
         }
     };
 
     class GameObject{
-        serialValue values[10] = {};
+        std::vector<serialValue> values;
         int nValues = 10;
     public:
         std::string name;
         float x = 0;
         float y = 0;
         float size = 0;
-        Texture tex;
+        Texture texture;
         Component *components[20] = { nullptr };
 
         void draw();

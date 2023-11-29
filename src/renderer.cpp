@@ -5,7 +5,7 @@
 #include <iostream>
 #include <string>
 #include <chrono>
-
+#include <vector>
 
 #define SCREENWIDTH 700
 #define SCREENHEIGHT 800
@@ -30,6 +30,9 @@ namespace engine {
     Camera2D* mainCamera;
    
     LPDIRECT3DVERTEXBUFFER9 v_buffer;
+
+    std::vector<Texture> textures;
+    int regTextures = 0;
 
     int InitializeWindow();
 
@@ -86,6 +89,10 @@ namespace engine {
     void drawTexturedSquare(float x, float y, float size, int color, LPDIRECT3DTEXTURE9 texture) {
         float halfSize = size * 0.5f;
 
+        if (texture == nullptr) {
+            return;
+        }
+
         TEXTUREDVERTEX vertices[] = {
             { x - halfSize, y - halfSize, 0.5f, 1.0f, D3DCOLOR_ARGB(128, 255, 255, 255), 0.0f, 0.0f },
             { x + halfSize, y - halfSize, 0.5f, 1.0f, D3DCOLOR_ARGB(128, 255, 255, 255), 1.0f, 0.0f },
@@ -130,18 +137,51 @@ namespace engine {
         invokeOnRender();
     }
 
-    int loadTexture(LPCWSTR path, LPDIRECT3DTEXTURE9* tex) {
+    void getRegisteredTextures(std::vector<Texture>* t) {
+        std::vector<Texture> tex;
+
+        for (int i = 0; i < textures.size(); i++) {
+            if (textures[i].lpdMat != nullptr) {
+                tex.push_back(textures[i]);
+            }
+        }
+
+        *t = tex;
+    }
+
+    void registerTexture(Texture t) {
+        if (textures.size() == 0 || regTextures + 1 >= textures.size()) {
+            logf("alloc more textures");
+            textures.resize(textures.size() + 10);
+
+        }
+
+        for (int i = 0; i < textures.size(); i++) {
+            if (textures[i].lpdMat == nullptr) {
+                textures[i] = t;
+                logf("Registered texture");
+                return;
+            }
+        }
+        logf("Failed to register texture", 'e');
+    }
+
+    int loadTexture(std::string name, LPCWSTR path, Texture* tex) {
         //HRESULT res = D3DXCreateTextureFromFile(device, path, tex);
 
         //sets alpha from texture
         D3DXIMAGE_INFO info;
+        Texture texture = Texture(NULL, name);
         D3DXGetImageInfoFromFile(path, &info);
-        HRESULT res =D3DXCreateTextureFromFileEx(device, path, info.Width, info.Height, 1, 0, D3DFMT_UNKNOWN, D3DPOOL_MANAGED, D3DX_DEFAULT, D3DX_DEFAULT, 0, &info, NULL, tex);
+        HRESULT res =D3DXCreateTextureFromFileEx(device, path, info.Width, info.Height, 1, 0, D3DFMT_UNKNOWN, D3DPOOL_MANAGED, D3DX_DEFAULT, D3DX_DEFAULT, 0, &info, NULL, &texture.lpdMat);
 
-        
+        *tex = texture;
+
+        engine::registerTexture(texture);
 
         if (res == D3D_OK) {
-            logf("Loaded texure");
+            std::string msg = "loaded texture " + name;
+            logf(msg);
             return 1;
         }
         else {
@@ -153,6 +193,17 @@ namespace engine {
     void endFrame() {
         // release the vertex buffer
         v_buffer->Release();
+    }
+
+    Texture::Texture(LPDIRECT3DTEXTURE9 tex, std::string name) {
+        this->lpdMat = tex;
+        this->name = name;
+    }
+
+    Texture::Texture() {
+        this->lpdMat = nullptr;
+        this->name = "Blank Texture";
+        
     }
 
 
@@ -334,11 +385,12 @@ namespace engine {
         ImGui_ImplDX9_CreateDeviceObjects();
     }
 
-    void setup() {
-        InitializeWindow();
+    void rendererInit() {
         logf("Renderer init");
+        InitializeWindow();
         mainCamera = new Camera2D(SCREENWIDTH, SCREENHEIGHT, 0.0f, 1);
         onDrawUI(&onDrawRendererUi);
-        
     }
+
+
 }

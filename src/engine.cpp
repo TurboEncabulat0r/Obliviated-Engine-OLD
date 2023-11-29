@@ -1,8 +1,12 @@
 #include "engine.h"
+#include "renderer.h"
 #include "gameObject.h"
-
+#include <vector>
+#include <chrono>
 namespace engine {
     bool vsync = true;
+
+    auto start = std::chrono::high_resolution_clock::now();
 
     void drawUi();
 
@@ -10,7 +14,7 @@ namespace engine {
         return vsync;
     }
 
-
+    
 
 
     fn* renderSubscribers[10] = {};
@@ -51,19 +55,50 @@ namespace engine {
                 onUpdateSubs[i]();
         }
     }
-    GameObject* gameObjects[100] = {};
+
+    std::vector<Component*> components;
+    int regComponents = 0;
+    void registerComponent(Component* c) {
+        if (components.size() == 0 || regComponents + 1 >= components.size()) {
+            components.resize(components.size() + 10);
+
+        }
+        for (int i = 0; i < components.size(); i++) {
+            if (components[i] == nullptr) {
+                components[i] = c;
+                regComponents++;
+                logf("Registered component");
+                return;
+            }
+        }
+    }
+
+
+
+    std::vector<GameObject*> gameObjects;
+    int registeredGameObjects = 0;
+    //GameObject* gameObjects[100] = {};
     void renderGameObjects() {
-        for (int i = 0; i < 100; i++) {
+
+        for (int i = 0; i < gameObjects.size(); i++) {
             if (gameObjects[i] != nullptr) {
                 gameObjects[i]->draw();
             }
         }
     }
 
+
+
     void registerGameObject(GameObject* go) {
-        for (int i = 0; i < 100; i++) {
+        if (gameObjects.size() == 0 || registeredGameObjects + 1 >= gameObjects.size()) {
+            logf("alloc more gameobjects");
+            gameObjects.resize(gameObjects.size() + 10);
+
+        }
+        for (int i = 0; i < gameObjects.size(); i++) {
             if (gameObjects[i] == nullptr) {
                 gameObjects[i] = go;
+                registeredGameObjects++;
                 logf("Registered gameobject");
                 return;
             }
@@ -72,9 +107,10 @@ namespace engine {
     }
 
     void unregisterGameObject(GameObject* go) {
-        for (int i = 0; i < 100; i++) {
+        for (int i = 0; i < gameObjects.size(); i++) {
             if (gameObjects[i] == go) {
                 gameObjects[i] = nullptr;
+                registeredGameObjects--;
                 logf("Unregistered gameobject");
                 return;
             }
@@ -83,7 +119,7 @@ namespace engine {
     }
 
 
-    void logf(char* str, char type) {
+    void logf(const char* str, char type) {
         if (type == 'd') {
             std::cout << "[DEBUG] " << str << std::endl;
         }
@@ -95,7 +131,11 @@ namespace engine {
         }
     }
 
-    void logf(char* str) {
+    void logf(const char* str) {
+        std::cout << "[INFO] " << str << std::endl;
+    }
+
+    void logf(std::string str) {
         std::cout << "[INFO] " << str << std::endl;
     }
 
@@ -104,9 +144,9 @@ namespace engine {
     void drawHierarchy() {
         ImGui::Begin("Hierarchy");
         if (ImGui::Button("Create Empty")) {
-            GameObject* go = new GameObject(0, 0, 0, "GameObject", NULL);
+            GameObject* go = new GameObject(0, 0, 0, "GameObject", Texture());
         }
-        for (int i = 0; i < 100; i++) {
+        for (int i = 0; i < gameObjects.size(); i++) {
             if (gameObjects[i] != nullptr) {
                 if (ImGui::Button(gameObjects[i]->name.c_str(), ImVec2(ImGui::GetWindowWidth(), 0))) {
                     selected = gameObjects[i];
@@ -132,6 +172,29 @@ namespace engine {
             ImGui::DragFloat("y", &selected->y);
             ImGui::SetNextItemWidth(140);
             ImGui::DragFloat("size", &selected->size);
+            // dropdown selectbox for texture
+            ImGui::SetNextItemWidth(140);
+
+            // draws a dropdown selectbox for textures
+            std::vector<Texture> textures;
+            getRegisteredTextures(&textures);
+            int selectedTexture = 0;
+            for (int i = 0; i < textures.size(); i++) {
+                if (textures[i].name == selected->texture.name || textures[i].lpdMat == selected->texture.lpdMat) {
+                    selectedTexture = i;
+                }
+            }
+            std::vector<const char*> textureNames;
+            for (int i = 0; i < textures.size(); i++) {
+                textureNames.push_back(textures[i].name.c_str());
+            }
+            ImGui::Combo("Texture", &selectedTexture, &textureNames[0], textureNames.size());
+            selected->texture = textures[selectedTexture];
+
+
+
+
+            
 
             selected->drawSerialElements();
         }
@@ -154,6 +217,12 @@ namespace engine {
         bool* callback;
     };
 
+    float getTime() {
+        auto now = std::chrono::high_resolution_clock::now();
+        std::chrono::duration<float> duration = now - start;
+        return duration.count();
+    }
+
     button* menuButtons[10] = {};
     int buttonindex = 0;
 
@@ -174,7 +243,6 @@ namespace engine {
         drawHierarchy();
         drawInspector();
         ImGui::Begin("Obliviated Engine");
-        ImGui::Text("dasjkdj");
 
         ImGui::Checkbox("VSync", &vsync);
 
@@ -183,6 +251,32 @@ namespace engine {
         }
 
         //ImGui::ShowDemoWindow();
+
+        // button for loading a texture, pops up a file dialog and loads the texture
+        if (ImGui::Button("Load Texture")) {
+            OPENFILENAME ofn;
+            TCHAR szFile[MAX_PATH] = { 0 };
+            ZeroMemory(&ofn, sizeof(ofn));
+            ofn.lStructSize = sizeof(ofn);
+            ofn.hwndOwner = NULL;
+            ofn.lpstrFilter = _T("Images\0*.bmp;*.png;*.jpg;*.jpeg;*.gif\0");
+            ofn.lpstrFile = szFile;
+            ofn.nMaxFile = MAX_PATH;
+            ofn.lpstrTitle = _T("Select an Image");
+            ofn.Flags = OFN_DONTADDTORECENT | OFN_FILEMUSTEXIST;
+
+            if (GetOpenFileName(&ofn)) {
+                LPCWSTR path = ofn.lpstrFile;
+
+                std::wstring wpath(path);
+
+                
+                
+                LPCWSTR lpath = wpath.c_str();
+                Texture t;
+                loadTexture("loaded", lpath, &t);
+            }
+        }
 
 
         for (int i = 0; i < 10; i++) {
@@ -202,6 +296,13 @@ namespace engine {
             ImGui::Text("FPS: %f", 1.0f / getDeltaTime());
             ImGui::End();
         }
+
+    }
+
+    void setup() {
+        rendererInit();
+
+
 
     }
 }
