@@ -9,6 +9,7 @@ namespace engine {
     auto start = std::chrono::high_resolution_clock::now();
 
     void drawUi();
+    void updateGameObjects();
 
     bool getVsync() {
         return vsync;
@@ -33,12 +34,9 @@ namespace engine {
         drawUiIndex++;
     }
 
-
-    fn* onUpdateSubs[10] = {};
-    int onUpdateIndex = 0;
+    std::vector<fn*> updateSubs;
     void onUpdate(fn* f) {
-        onUpdateSubs[onUpdateIndex] = f;
-        onUpdateIndex++;
+        updateSubs.push_back(f);
     }
 
     void invokeOnDrawUi() {
@@ -50,9 +48,10 @@ namespace engine {
     }
 
     void invokeOnUpdate() {
-        for (int i = 0; i < 10; i++) {
-            if (onUpdateSubs[i] != nullptr)
-                onUpdateSubs[i]();
+        updateGameObjects();
+        for (int i = 0; i < updateSubs.size(); i++) {
+            if (updateSubs[i] != nullptr)
+                updateSubs[i]();
         }
     }
 
@@ -87,7 +86,13 @@ namespace engine {
         }
     }
 
-
+    void updateGameObjects() {
+        for (int i = 0; i < gameObjects.size(); i++) {
+            if (gameObjects[i] != nullptr) {
+                gameObjects[i]->update();
+            }
+        }
+    }
 
     void registerGameObject(GameObject* go) {
         if (gameObjects.size() == 0 || registeredGameObjects + 1 >= gameObjects.size()) {
@@ -302,7 +307,7 @@ namespace engine {
     void setup() {
         rendererInit();
 
-
+        updateSubs.resize(10);
 
     }
 }

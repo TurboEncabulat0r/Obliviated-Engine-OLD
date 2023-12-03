@@ -27,6 +27,9 @@ namespace engine{
     class GameObject{
         std::vector<serialValue> values;
         int nValues = 10;
+
+        void updateComponents();
+        void addComp(Component* c);
     public:
         std::string name;
         float x = 0;
@@ -37,13 +40,17 @@ namespace engine{
 
         void draw();
 
+        void update();
+
+        virtual void Update();
+
         GameObject(float x, float y, float size, std::string name, Texture tex);
 
         ~GameObject();
 
         void addSerialValue(const char* label, char t, uintptr_t p);
 
-        void updateComponents();
+        
 
         void serializeValue(const char* tag, float* v);
 
@@ -55,11 +62,14 @@ namespace engine{
 
         void drawSerialElements();
 
-        template <typename T>
-        T* addComponent();
+        template <typename T> T* addComponent() {
 
-        template <typename T>
-        T* getComponent();
+            auto c = new T(this);
+            addComp(c);
+            return c;
+        }
+
+        template <typename T> T* getComponent();
 
         void destroyComponent(Component* component);
 

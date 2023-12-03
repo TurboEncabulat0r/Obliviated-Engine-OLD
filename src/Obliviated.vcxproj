@@ -168,6 +168,8 @@
     <ClCompile Include="main.cpp" />
     <ClCompile Include="playerMovement.cpp" />
     <ClCompile Include="renderer.cpp" />
+    <ClCompile Include="Rigidbody.cpp" />
+    <ClCompile Include="TestComp.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="camera.h" />
@@ -175,6 +177,7 @@
     <ClInclude Include="engine.h" />
     <ClInclude Include="game.h" />
     <ClInclude Include="gameObject.h" />
+    <ClInclude Include="Rigidbody.h" />
     <ClInclude Include="include\imconfig.h" />
     <ClInclude Include="include\imgui.h" />
     <ClInclude Include="include\imgui_impl_dx9.h" />
@@ -185,6 +188,7 @@
     <ClInclude Include="include\imstb_truetype.h" />
     <ClInclude Include="input.h" />
     <ClInclude Include="renderer.h" />
+    <ClInclude Include="TestComp.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -16,7 +16,7 @@ namespace engine {
     }
 
     void Component::update() {
-
+        
     }
 
     void Component::draw() {

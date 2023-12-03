@@ -1,5 +1,7 @@
 #include "gameObject.h"
 #include "engine.h"
+#include "component.h"
+#include "TestComp.h"
 namespace engine{
     void GameObject::draw() {
         if (this->texture.lpdMat != nullptr)
@@ -115,6 +117,15 @@ namespace engine{
         }
     }
 
+    void GameObject::update() {
+        this->updateComponents();
+        this->Update();
+    }
+
+    void GameObject::Update() {
+
+    }
+
     void GameObject::destroy() {
         for (int i = 0; i < 20; i++) {
             if (components[i] != nullptr) {
@@ -122,6 +133,26 @@ namespace engine{
             }
         }
         unregisterGameObject(this);
+    }
+
+    template <typename T> T* GameObject::getComponent() {
+        for (int i = 0; i < 20; i++) {
+            if (components[i] != nullptr) {
+                T* t = dynamic_cast<T*>(components[i]);
+                if (t != nullptr) {
+                    return t;
+                }
+            }
+        }
+        return nullptr;
+    }
+
+    void GameObject::addComp(Component* c) {
+        for (int i = 0; i < 20; i++) {
+            if (components[i] == nullptr) {
+                components[i] = c;
+            }
+        }
     }
 
     void GameObject::destroyComponent(Component* component) {
