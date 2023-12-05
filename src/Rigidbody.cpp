@@ -7,8 +7,9 @@ namespace engine {
 
 
 	Rigidbody::Rigidbody(GameObject* gameObject) : Component(gameObject, "Rigidbody") {
-		this->gameObject->serializeValue("velx", &velx);
-		this->gameObject->serializeValue("vely", &vely);
+		this->serializeValue("velx", &velx);
+		this->serializeValue("vely", &vely);
+		this->serializeValue("grounded", &grounded);
 		x = &this->gameObject->x;
 		y = &this->gameObject->y;
 	}
@@ -18,11 +19,11 @@ namespace engine {
 		vely += y;
 	}
 
-	void applyFriction(float& velocity, float friction, float deltaTime)
+	void applyFriction(float& velocity, float friction)
 	{
 		if (velocity > 0.0f)
 		{
-			velocity -= friction * velocity * deltaTime;
+			velocity -= friction * velocity;
 			if (velocity < 0.0f)
 			{
 				velocity = 0.0f;
@@ -30,7 +31,7 @@ namespace engine {
 		}
 		else if (velocity < 0.0f)
 		{
-			velocity += friction * (-velocity) * deltaTime;
+			velocity += friction * (-velocity);
 			if (velocity > 0.0f)
 			{
 				velocity = 0.0f;
@@ -52,19 +53,24 @@ namespace engine {
 	
 
 	void Rigidbody::update() {
-		this->vely += 5 * getDeltaTime();
+		this->vely -= 2.81;
 
-		*x += velx * getDeltaTime() * 0.6f;
-		*y += vely * getDeltaTime() * 0.6f;
+		*x += velx * getDeltaTime();
+		*y += vely * getDeltaTime();
 
-		applyFriction(velx, 0.3f, getDeltaTime());
-
-		velx = clamp(velx, -20, 20);
 		
 
-		if (*y > 500) {
-			*y = 500;
+		velx = clamp(velx, -200, 200);
+
+		applyFriction(velx, 0.1f);
+
+		if (*y < -50) {
+			*y = -50;
 			vely = 0;
+			grounded = true;
+		}
+		else {
+			grounded = false;
 		}
 	}
 

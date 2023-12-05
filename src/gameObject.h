@@ -9,24 +9,10 @@ namespace engine{
     // forward declaration 
     class Component;
 
-    struct serialValue {
-        const char* label;
-        char type = 0;
-        uintptr_t ptr;
-        serialValue(const char* l, char t, uintptr_t p) {
-            this->label = l;
-            this->type = t;
-            this->ptr = p;
-        }
 
-        serialValue() {
-            this->type = 0;
-        }
-    };
 
     class GameObject{
-        std::vector<serialValue> values;
-        int nValues = 10;
+
 
         void updateComponents();
         void addComp(Component* c);
@@ -48,19 +34,7 @@ namespace engine{
 
         ~GameObject();
 
-        void addSerialValue(const char* label, char t, uintptr_t p);
-
-        
-
-        void serializeValue(const char* tag, float* v);
-
-        void serializeValue(const char* tag, int* v);
-
-        void serializeValue(const char* tag, bool* v);
-
-        void serializeValue(const char* tag, std::string* s);
-
-        void drawSerialElements();
+        void drawSerialValues();
 
         template <typename T> T* addComponent() {
 

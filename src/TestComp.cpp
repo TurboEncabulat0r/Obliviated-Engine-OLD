@@ -3,8 +3,8 @@
 
 namespace engine {
 
-    TestComp::TestComp(GameObject* gameObject, std::string name) : Component(gameObject, name) {
-        this->gameObject->serializeValue("Gaming", &this->gaming);
+    TestComp::TestComp(GameObject* gameObject) : Component(gameObject, "TEST") {
+        this->serializeValue("Gaming", &this->gaming);
     }
 
     void TestComp::update() {

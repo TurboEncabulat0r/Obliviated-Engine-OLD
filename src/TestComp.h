@@ -8,7 +8,7 @@ namespace engine {
     class TestComp : public Component {
     public:
         int gaming = 0;
-        TestComp(GameObject* gameObject, std::string name);
+        TestComp(GameObject* gameObject);
 
         virtual void update();
 

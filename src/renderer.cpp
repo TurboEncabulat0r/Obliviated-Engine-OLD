@@ -7,8 +7,12 @@
 #include <chrono>
 #include <vector>
 
-#define SCREENWIDTH 700
-#define SCREENHEIGHT 800
+#define SCREENWIDTH 1920
+#define SCREENHEIGHT 1080
+
+#define RENDERWIDTH 1920
+#define RENDERHEIGHT 1080
+
 extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
 
@@ -18,6 +22,11 @@ namespace engine {
     static LPDIRECT3D9              g_pD3D = NULL;
     static LPDIRECT3DDEVICE9        device = NULL;
     static D3DPRESENT_PARAMETERS    g_d3dpp = {};
+    IDirect3DSurface9* pRenderTargetSurface = nullptr;
+    IDirect3DTexture9* pRenderTargetTexture = nullptr;
+    IDirect3DSurface9* pBackBufferSurface = nullptr;
+
+    Texture tex;
 
     bool CreateDeviceD3D(HWND hWnd);
     void CleanupDeviceD3D();
@@ -36,58 +45,92 @@ namespace engine {
 
     int InitializeWindow();
 
-    void drawSquare(float x, float y, float size, int color) {
-        float halfSize = size * 0.5f;  // Half of the square size
 
-        CUSTOMVERTEX vertices[] =
-        {
-            { x - halfSize, y - halfSize, 0.5f, 1.0f, color, },
-            { x + halfSize, y - halfSize, 0.5f, 1.0f, color, },
-            { x - halfSize, y + halfSize, 0.5f, 1.0f, color, },
-            { x + halfSize, y + halfSize, 0.5f, 1.0f, color, },
-        };
+    void drawLine(float x1, float y1, float x2, float y2, int color){
+        D3DXVECTOR2 lines[] = { D3DXVECTOR2(x1, y1), D3DXVECTOR2(x2, y2) };
+        D3DCOLOR colors[] = { color, color };
+        device->SetFVF(D3DFVF_XYZRHW | D3DFVF_DIFFUSE);
 
+        // applies the 2d cameras translation from the view matrix
+        for (int i = 0; i < 2; ++i) {
+            lines[i].x += mainCamera->position.x;
+            lines[i].y += mainCamera->position.y;
+        }
+
+        // applies the 2d cameras scale from the projection matrix
+        for (int i = 0; i < 2; ++i) {
+            lines[i].x *= mainCamera->scale;
+            lines[i].y *= mainCamera->scale;
+        }
+
+        device->DrawPrimitiveUP(D3DPT_LINELIST, 1, lines, sizeof(D3DXVECTOR2));
+    }
+
+    void drawTriangle(float x1, float y1, float x2, float y2, float x3, float y3, int color) {
+        D3DXVECTOR2 lines[] = { D3DXVECTOR2(x1, y1), D3DXVECTOR2(x2, y2), D3DXVECTOR2(x3, y3) };
+        D3DCOLOR colors[] = { color, color, color };
+        device->SetFVF(D3DFVF_XYZRHW | D3DFVF_DIFFUSE);
+
+        // lock, copy, and unlock vertex buffer
         VOID* pVoid;
         v_buffer->Lock(0, 0, (void**)&pVoid, 0);
-        memcpy(pVoid, vertices, sizeof(vertices));
+        memcpy(pVoid, lines, sizeof(lines));
         v_buffer->Unlock();
 
-        device->SetRenderState(D3DRS_LIGHTING, FALSE);
-        device->SetRenderState(D3DRS_CULLMODE, D3DCULL_NONE);
-        device->SetFVF(D3DFVF_XYZRHW | D3DFVF_DIFFUSE);
-        device->SetStreamSource(0, v_buffer, 0, sizeof(CUSTOMVERTEX));
-
-        device->DrawPrimitive(D3DPT_TRIANGLESTRIP, 0, 2);
+        device->DrawPrimitiveUP(D3DPT_TRIANGLELIST, 1, lines, sizeof(D3DXVECTOR2));
     }
 
 
-    void drawTriangle(float x1, float y1, float x2, float y2, float x3, float y3, int color) {
-        CUSTOMVERTEX vertices[] =
+    void RenderGrid()
+    {
+        const int gridSize = 10;  // Number of grid lines in each direction
+        const float gridSpacing = 1.0f;  // Distance between grid lines
+
+        struct Vertex
         {
-            { x1, y1, 0.5f, 1.0f, color, },
-            { x2, y2, 0.5f, 1.0f, color, },
-            { x3, y3, 0.5f, 1.0f, color, },
+            float x, y, z;  // Position of vertex in 3D space
+            DWORD color;    // Diffuse color of vertex
         };
 
-        device->SetRenderState(D3DRS_LIGHTING, FALSE);
-        device->SetRenderState(D3DRS_CULLMODE, D3DCULL_NONE);
+        Vertex vertices[(gridSize + 1) * 4];
+        for (int i = 0; i <= gridSize; ++i)
+        {
+            float fPercent = i / (float)gridSize;
+            float fPos = (fPercent * 2.0f) - 1.0f;
+            DWORD col = (i == gridSize / 2) ? 0xffffffff : 0xff808080;
+            vertices[i * 4 + 0] = { fPos, -1.0f, 0.0f, col };
+            vertices[i * 4 + 1] = { fPos, 1.0f, 0.0f, col };
+            vertices[i * 4 + 2] = { -1.0f, fPos, 0.0f, col };
+            vertices[i * 4 + 3] = { 1.0f, fPos, 0.0f, col };
+        }
 
-        VOID* pVoid;
 
-        // lock v_buffer and load the vertices into it
-        v_buffer->Lock(0, 0, (void**)&pVoid, 0);
-        memcpy(pVoid, vertices, sizeof(vertices));
-        v_buffer->Unlock();
 
-        device->SetFVF(D3DFVF_XYZRHW | D3DFVF_DIFFUSE);
-        device->SetStreamSource(0, v_buffer, 0, sizeof(CUSTOMVERTEX));
+        // render it
+        device->SetRenderState(D3DRS_ZENABLE, FALSE);
+        device->SetRenderState(D3DRS_ALPHABLENDENABLE, FALSE);
+        device->SetRenderState(D3DRS_SCISSORTESTENABLE, FALSE);
 
-        // copy the vertex buffer to the back buffer
-        device->DrawPrimitive(D3DPT_TRIANGLELIST, 0, 1);
+        // transform the vertexes
+        mainCamera->SetTransform(device);
+
+        // multiplies scale of grid by 10
+        for (int i = 0; i < gridSize * 4; ++i) {
+            vertices[i].x *= 100;
+            vertices[i].y *= 100;
+        }
+
+
+        device->SetFVF(D3DFVF_XYZ | D3DFVF_DIFFUSE);
+        device->DrawPrimitiveUP(D3DPT_LINELIST, gridSize * 4, vertices, sizeof(Vertex));
+
     }
     
     void drawTexturedSquare(float x, float y, float size, int color, LPDIRECT3DTEXTURE9 texture) {
         float halfSize = size * 0.5f;
+
+        x *= 10;
+        y *= 10;
 
         if (texture == nullptr) {
             return;
@@ -112,6 +155,7 @@ namespace engine {
             vertices[i].y *= mainCamera->scale;
         }
 
+
         // Lock, copy, and unlock vertex buffer
         VOID* pVoid;
         v_buffer->Lock(0, 0, (void**)&pVoid, 0);
@@ -134,7 +178,9 @@ namespace engine {
         device->CreateVertexBuffer(8 * sizeof(TEXTUREDVERTEX),
         0, D3DFVF_XYZRHW | D3DFVF_DIFFUSE,
         D3DPOOL_MANAGED, &v_buffer, NULL);
-        invokeOnRender();
+
+        // sets the vertex buffer
+        
     }
 
     void getRegisteredTextures(std::vector<Texture>* t) {
@@ -165,6 +211,9 @@ namespace engine {
         }
         logf("Failed to register texture", 'e');
     }
+
+
+
 
     int loadTexture(std::string name, LPCWSTR path, Texture* tex) {
         //HRESULT res = D3DXCreateTextureFromFile(device, path, tex);
@@ -220,6 +269,21 @@ namespace engine {
         return deltaTime;
     }
 
+
+    void OnResize(int width, int height)
+    {
+        // Update the presentation parameters
+        g_d3dpp.BackBufferWidth = width;
+        g_d3dpp.BackBufferHeight = height;
+        // Adjust the aspect ratio in the projection matrix
+        D3DXMATRIX projectionMatrix;
+        D3DXMatrixPerspectiveFovLH(&projectionMatrix, D3DX_PI / 4.0f, (float)width / (float)height, 1.0f, 1000.0f);
+        device->SetTransform(D3DTS_PROJECTION, &projectionMatrix);
+
+        // Reset the device
+        ResetDevice();
+    }
+
     int InitializeWindow() {
         engine::logf("Engine Init");
 
@@ -244,16 +308,6 @@ namespace engine {
 
         ImGui_ImplWin32_Init(hwnd);
         ImGui_ImplDX9_Init(device);
-
-        D3DVIEWPORT9 viewport;
-        viewport.X = 0;
-        viewport.Y = 0;
-        viewport.Width = SCREENWIDTH;
-        viewport.Height = SCREENHEIGHT;
-        viewport.MinZ = 0.0f;
-        viewport.MaxZ = 1.0f;
-
-        device->SetViewport(&viewport);
     }
 
     void ShutDown() {
@@ -266,7 +320,26 @@ namespace engine {
         ::UnregisterClassW(wc.lpszClassName, wc.hInstance);
     }
 
+    struct FullscreenVertex
+    {
+        float x, y, z, rhw;
+        float tu, tv; // Texture coordinates
+
+        FullscreenVertex(float _x, float _y, float _z, float _rhw, float _tu, float _tv)
+            : x(_x), y(_y), z(_z), rhw(_rhw), tu(_tu), tv(_tv) {}
+    };
+
+    // Define the vertices for a fullscreen quad
+    FullscreenVertex fullscreenQuad[] =
+    {
+        FullscreenVertex(-1.0f, -1.0f, 0.0f, 1.0f, 0.0f, 1.0f),
+        FullscreenVertex(-1.0f,  1.0f, 0.0f, 1.0f, 0.0f, 0.0f),
+        FullscreenVertex(1.0f, -1.0f, 0.0f, 1.0f, 1.0f, 1.0f),
+        FullscreenVertex(1.0f,  1.0f, 0.0f, 1.0f, 1.0f, 0.0f),
+    };
+
     ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
+    D3DVIEWPORT9 viewport;
     int FullRender() {
         auto start = std::chrono::high_resolution_clock::now();
 
@@ -283,22 +356,72 @@ namespace engine {
         ImGui::EndFrame();
 
 
-        device->SetRenderState(D3DRS_ZENABLE, FALSE);
-        device->SetRenderState(D3DRS_ALPHABLENDENABLE, FALSE);
-        device->SetRenderState(D3DRS_SCISSORTESTENABLE, FALSE);
 
         // update camera and transform the vertexes
         mainCamera->Update();
-        mainCamera->SetTransform(device);
 
-        D3DCOLOR clear_col_dx = D3DCOLOR_RGBA((int)(clear_color.x * clear_color.w * 255.0f), (int)(clear_color.y * clear_color.w * 255.0f), (int)(clear_color.z * clear_color.w * 255.0f), (int)(clear_color.w * 255.0f));
-        device->Clear(0, NULL, D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER, clear_col_dx, 1.0f, 0);
+
         if (device->BeginScene() >= 0)
         {
-            // draw game objects
+            // sets the vertex buffer
             engine::newFrame();
-            engine::endFrame();
 
+            // sets render target to texture
+            device->SetRenderTarget(0, pRenderTargetSurface);
+            viewport.X = 0;
+            viewport.Y = 0;
+            viewport.Width = RENDERWIDTH;    // Set to the width of your render target
+            viewport.Height = RENDERHEIGHT;  // Set to the height of your render target
+            viewport.MinZ = 0.0f;
+            viewport.MaxZ = 1.0f;
+            device->SetViewport(&viewport);
+            device->Clear(0, nullptr, D3DCLEAR_TARGET, D3DCOLOR_XRGB(0, 0, 255), 1.0f, 0);
+            
+            device->SetRenderState(D3DRS_ZENABLE, TRUE);
+            device->SetRenderState(D3DRS_ALPHABLENDENABLE, TRUE);
+            device->SetRenderState(D3DRS_SCISSORTESTENABLE, TRUE);
+            // sets texture
+            device->SetTexture(0, pRenderTargetTexture);
+            
+            // triangle will not draw here
+
+
+
+            
+            // all rendering
+
+
+            device->SetRenderTarget(0, pBackBufferSurface);
+            viewport.X = 0;
+            viewport.Y = 0;
+            viewport.Width = SCREENWIDTH;    // Set to the width of your render target
+            viewport.Height = SCREENHEIGHT;  // Set to the height of your render target
+            viewport.MinZ = 0.0f;
+            viewport.MaxZ = 1.0f;
+            device->SetViewport(&viewport);
+
+            device->Clear(0, nullptr, D3DCLEAR_TARGET, D3DCOLOR_XRGB(255, 0, 0), 1.0f, 0);
+            device->SetRenderState(D3DRS_ZENABLE, TRUE);
+            device->SetRenderState(D3DRS_ALPHABLENDENABLE, TRUE);
+            device->SetRenderState(D3DRS_SCISSORTESTENABLE, TRUE);
+            device->SetTexture(0, pRenderTargetTexture);
+            device->SetFVF(D3DFVF_XYZRHW | D3DFVF_TEX1);
+
+            // lock, copy, and unlock vertex buffer
+            void* pVoid;
+            v_buffer->Lock(0, 0, (void**)&pVoid, 0);
+            memcpy(pVoid, fullscreenQuad, sizeof(fullscreenQuad));
+            v_buffer->Unlock();
+
+            // set stream source
+            
+            device->DrawPrimitiveUP(D3DPT_TRIANGLESTRIP, 2, fullscreenQuad, sizeof(FullscreenVertex));
+            RenderGrid();
+            invokeOnRender();
+
+            drawTexturedSquare(0, 0, 300, 0xffffff, tex.lpdMat);
+
+            engine::endFrame();
             // end the scene
             ImGui::Render();
             ImGui_ImplDX9_RenderDrawData(ImGui::GetDrawData());
@@ -356,9 +479,13 @@ namespace engine {
             {
                 g_d3dpp.BackBufferWidth = LOWORD(lParam);
                 g_d3dpp.BackBufferHeight = HIWORD(lParam);
-                ResetDevice();
+                int width = LOWORD(lParam);
+                int height = HIWORD(lParam);
+
+                OnResize(width, height);
             }
             return 0;
+
         case WM_SYSCOMMAND:
             if ((wParam & 0xfff0) == SC_KEYMENU) // Disable ALT application menu
                 return 0;
@@ -374,6 +501,11 @@ namespace engine {
     {
         if (device) { device->Release(); device = NULL; }
         if (g_pD3D) { g_pD3D->Release(); g_pD3D = NULL; }
+        if (pRenderTargetSurface != nullptr)
+            pRenderTargetSurface->Release();
+
+        if (pRenderTargetTexture != nullptr)
+            pRenderTargetTexture->Release();
     }
 
     void ResetDevice()
@@ -387,8 +519,18 @@ namespace engine {
 
     void rendererInit() {
         logf("Renderer init");
+        loadTexture("fred_texture", L"textures/cat.png", &tex);
         InitializeWindow();
         mainCamera = new Camera2D(SCREENWIDTH, SCREENHEIGHT, 0.0f, 1);
+
+        device->CreateTexture(RENDERWIDTH, RENDERHEIGHT, 1, D3DUSAGE_RENDERTARGET, D3DFMT_X8R8G8B8, D3DPOOL_DEFAULT, &pRenderTargetTexture, nullptr);
+        pRenderTargetTexture->GetSurfaceLevel(0, &pRenderTargetSurface);
+
+        
+
+        // Assuming g_pd3dDevice is your Direct3D device
+        device->GetBackBuffer(0, 0, D3DBACKBUFFER_TYPE_MONO, &pBackBufferSurface);
+
         onDrawUI(&onDrawRendererUi);
     }
 

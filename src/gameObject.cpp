@@ -5,7 +5,7 @@
 namespace engine{
     void GameObject::draw() {
         if (this->texture.lpdMat != nullptr)
-            drawTexturedSquare(x, y, size, 0xffffff, this->texture.lpdMat);
+            drawTexturedSquare(x, -y, size, 0xffffff, this->texture.lpdMat);
     }
 
     GameObject::GameObject(float x, float y, float size, std::string name, Texture tex) {
@@ -15,7 +15,6 @@ namespace engine{
         this->texture = tex;
         this->name = name;
         registerGameObject(this);
-        this->values.resize(10);
 
         for (int i = 0; i < 20; i++) {
             if (components[i] != nullptr) {
@@ -24,86 +23,20 @@ namespace engine{
         }
     }
 
-
-    void GameObject::addSerialValue(const char* label, char t, uintptr_t p) {
-        if (values.size() == 0 || nValues + 1 >= values.size()) {
-            values.resize(values.size() + 10);
-            logf("alloc more values; new value: " + std::to_string(values.size()));
-
-        }
-
-        std::string s = label;
-        logf("serialized value: " + s);
-        for (int i = 0; i < nValues; i++) {
-            if (values[i].type == 0) {
-                values[i] = serialValue(label, t, p);
-                nValues++;
-                break;
+    void GameObject::drawSerialValues() {
+        // loops through all components and calls drawSerialElements
+        for (int i = 0; i < 20; i++) {
+            if (components[i] != nullptr) {
+                if (components[i]->name.length() < 2)
+                    continue;
+                if (ImGui::CollapsingHeader(components[i]->name.c_str())) {
+                    components[i]->drawSerialElements();
+                }
             }
         }
+
     }
 
-    // reinterprate values
-    // int* newPtr = reinterpret_cast<int*>(intptr);
-    void GameObject::serializeValue(const char* tag, float* v) {
-        uintptr_t ptr = reinterpret_cast<uintptr_t>(v);
-
-        addSerialValue(tag ,'f', ptr);
-    }
-
-    void GameObject::serializeValue(const char* tag, int* v) {
-        uintptr_t ptr = reinterpret_cast<uintptr_t>(v);
-
-        addSerialValue(tag, 'i', ptr);
-    }
-
-    void GameObject::serializeValue(const char* tag, bool* v) {
-        uintptr_t ptr = reinterpret_cast<uintptr_t>(v);
-
-        addSerialValue(tag, 'b', ptr);
-    }
-
-    void GameObject::serializeValue(const char* tag, std::string* v) {
-        uintptr_t ptr = reinterpret_cast<uintptr_t>(v);
-
-        addSerialValue(tag, 's', ptr);
-    }
-
-    void drawSerialElement(serialValue v) {
-        int* iptr;
-        float* fptr;
-        bool* bptr;
-        switch (v.type)
-        {
-        case 'i':
-            iptr = reinterpret_cast<int*>(v.ptr);
-            ImGui::InputInt(v.label, iptr);
-            break;
-        case 'f':
-            fptr = reinterpret_cast<float*>(v.ptr);
-            ImGui::DragFloat(v.label, fptr);
-            break;
-        case 'b':
-            bptr = reinterpret_cast<bool*>(v.ptr);
-            ImGui::Checkbox(v.label, bptr);
-            break;
-        case 't':
-            bptr = reinterpret_cast<bool*>(v.ptr);
-            ImGui::Checkbox(v.label, bptr);
-            break;
-        default:
-            break;
-        }
-    }
-
-    void GameObject::drawSerialElements() {
-        for (int i = 0; i < this->values.size(); i++) {
-            if (this->values[i].type != 'n') {
-                ImGui::SetNextItemWidth(140);
-                drawSerialElement(this->values[i]);
-            }
-        }
-    }
 
     GameObject::~GameObject() {
         destroy();
@@ -135,6 +68,15 @@ namespace engine{
         unregisterGameObject(this);
     }
 
+    //void GameObject::getComp(Component* c) {
+    //    for (int i = 0; i < 20; i++) {
+    //        if (components[i] == nullptr) {
+    //            components[i] = c;
+    //            break;
+    //        }
+    //    }
+    //}
+    
     template <typename T> T* GameObject::getComponent() {
         for (int i = 0; i < 20; i++) {
             if (components[i] != nullptr) {
@@ -151,6 +93,7 @@ namespace engine{
         for (int i = 0; i < 20; i++) {
             if (components[i] == nullptr) {
                 components[i] = c;
+                break;
             }
         }
     }

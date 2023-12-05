@@ -66,7 +66,7 @@ namespace engine {
             if (components[i] == nullptr) {
                 components[i] = c;
                 regComponents++;
-                logf("Registered component");
+                logf("Registered component name:" + c->name);
                 return;
             }
         }
@@ -178,6 +178,7 @@ namespace engine {
             ImGui::SetNextItemWidth(140);
             ImGui::DragFloat("size", &selected->size);
             // dropdown selectbox for texture
+            
             ImGui::SetNextItemWidth(140);
 
             // draws a dropdown selectbox for textures
@@ -201,7 +202,7 @@ namespace engine {
 
             
 
-            selected->drawSerialElements();
+            selected->drawSerialValues();
         }
         ImGui::End();
     }

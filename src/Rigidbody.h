@@ -11,7 +11,8 @@ namespace engine {
         float* y;
         float velx = 0;
         float vely = 0;
-        float friction = 0.997;
+        float friction = 0.89;
+        bool grounded;
 
         Rigidbody(GameObject* gameObject);
 
